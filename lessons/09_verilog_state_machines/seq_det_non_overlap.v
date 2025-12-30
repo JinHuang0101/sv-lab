@@ -76,6 +76,7 @@ module tb_seq_det_non_overlap();
 	wire detected;		// output: 1 when '101' is found
 	wire [1:0] state_out;		// for debugging (shows current state)
 
+	// Test Vector 
 	// The main test pattern 
 	// 14 bits: from MSB to LSB, fed from left to right 
 	// 0011_0001_0101_01
@@ -92,9 +93,10 @@ module tb_seq_det_non_overlap();
 	);
 
 	// clock signal generation 
+	// 2 us perid (1 us high + 1 us low)
 	initial begin 
 		forever begin 
-			#1 clk = ~clk;
+			#1 clk = ~clk;		// Toggle every 1 us, 500 kHz clock 
 		end 
 	end 
 
@@ -105,7 +107,7 @@ module tb_seq_det_non_overlap();
 		
 		// reset sequence 
 		rst_n = 0;		// assert reset  
-		#2.5; 
+		#2.5;			// hold for 2.5 us
 		rst_n = 1;		// release reset 
 
 		repeat(2) @ (posedge clk);		// wait 2 clock cycles for settling 
@@ -117,9 +119,10 @@ module tb_seq_det_non_overlap();
 										// FSM waits for the rising edge to reads seq_in
 		end 
 
+		// Feed 15 random bits 
 		for(i=0; i<15; i=i+1) begin 
-			seq_in = $random;
-			@(posedge clk);
+			seq_in = $random;		// generate random 0 or 1 
+			@(posedge clk);			// wait for clock edge (FSM samples it)
 		end 
 
 		// Idle for a while 
